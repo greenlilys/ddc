@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+	<head>
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<link rel="stylesheet" type="text/css" href="../css/aui.css" />
+		<link rel="stylesheet" type="text/css" href="../css/dropload.css"/>
+		<link rel="stylesheet" type="text/css" href="../css/aui-pull-refresh.css" />
+		<link rel="stylesheet" type="text/css" href="../css/mui.min.css" />
+	</head>
+	<body>
+		<section class="aui-refresh-content">
+			<div class="aui-content">
+				<div id="demo">
+					<ul class="mui-table-view mui-table-view-chevron" id="list"></ul>
+				</div>
+			</div>
+		</section>
+	</body>
+	<script src="../script/myUtils.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../script/api.js"></script>
+	<script type="text/javascript" src="../script/dropload.min.js"></script>
+	<script src="../script/aui-pull-refresh.js"></script>
+	<script type="text/javascript">
+		var mobile = $api.getStorage('mobile');
+		//我的手机
+		var name = $api.getStorage('name');
+		//我名字
+		var sfz = $api.getStorage('sfz');
+		//我的身份证
+		var token = $api.getStorage('token');
+		//用户令牌
+		var user_id = $api.getStorage('user_id');
+		//用户ID
+		var pageNum, wrap,aMapLBS;
+		//总条数
+		var pageSize = 5//每页显示的条数
+		var Flag = false;
+		var count = 0;
+		var page = 1;
+		//刷新次数
+		apiready = function() {
+			
+			var param = {};
+			param.loadingImgae = 'widget://image/refresh.png';
+			//定义刷新小箭头的图片
+			param.bgColor = '#ccc';
+			//定义下拉刷新区域的背景
+			param.textColor = '#fff';
+			//定义下拉刷新提示文字的颜色
+			param.textDown = '下拉试试...';
+			//定义下拉刷新文字
+			param.textUp = '松开试试...';
+			//定义松开刷新文字
+			param.showTime = true;
+			//定义是否显示最后一次刷新时间
+			api.setRefreshHeaderInfo(param, function(ret, err) {
+				toDoRequest();
+			});
+			api.addEventListener({
+				name : 'scrolltobottom',
+				extra : {
+					threshold : 100
+				}
+			}, function(ret, err) {
+				fnGetWareList();
+			});
+			fnGetWareList()
+		}
+		function toDoRequest() {
+			api.refreshHeaderLoadDone();
+			//复位下拉刷新
+		}
+		
+		function fnGetWareList() {
+			var mall = {
+				"func" : "1009",
+				"token" : token, //
+				"user_id" : user_id, //
+				"rows" : pageSize, //
+				"page" : page
+			}
+			api.ajax({
+				url : "http://47.98.166.93:8800/gps-api/api",
+				method : 'post',
+				timeout : 30,
+				dataType : 'json',
+				returnAll : false,
+				data : {
+					values : {
+						param : JSON.stringify(mall),
+						sign : "123"
+					}
+				}
+			}, function(ret, err) {
+				if (ret) {
+					var code = ret.code;
+					if (code == 1) {
+						var total = ret.total;
+						var dat = ret.list;
+						//判断是否有返回值 当没有返回值的时候就为空，则代表没有更多数据了
+						page++;
+						listone(dat);
+					}
+				}
+			})
+		}
+
+		/**
+		 * 绘制#list
+		 */
+		function listone(songs) {
+			var list = document.getElementById("demo");
+			var fragment = document.createDocumentFragment();
+			var li;
+			for (var i = 0; i < songs.length; i++) {
+				var id = songs[i].orderStatus;
+				var alarm_type = songs[i].alarm_type;
+				//消息类型，1欠费，2设防/位移，3震动/碰撞，4超速，
+				var alarm_content = songs[i].alarm_content;
+				//正文
+				var carno = songs[i].carno;
+				var _time = parseInt(songs[i].alarm_time);
+				var alarm_time = sub(_time);
+				if (alarm_type == 1) {
+					src = '<img src="../image/ic_no_money.png">';
+					type = '欠费'
+				}
+				if (alarm_type == 2) {
+					src = '<img src="../image/ic_no_power.png">';
+					type = '设防/位移'
+				}
+				if (alarm_type == 3) {
+					src = '<img src="../image/ic_msg_alarm.png">';
+					type = '震动/碰撞'
+				}
+				if (alarm_type == 4) {
+					src = '<img src="../image/ic_over_speed.png">';
+					type = '超速'
+				}
+				if (alarm_type == 5) {
+					src = '<img src="../image/ic_out_fence.png">';
+					type = '超速??'
+				}
+				li = document.createElement('li');
+				li.className = '';
+				li.innerHTML = '<div class="mui-card">' + '<div class="mui-card-header mui-card-media">' + '' + src + '' + '<div class="mui-media-body">' + type + '</div>' + '</div>' + '<div class="mui-card-footer">' + '<p class="mui-card-link">' + carno + '</p>' + '<p class="mui-card-link">' + alarm_time + '</p>' + '</div>' + '<div class="mui-footer">' + '<p class="mui-p">' + alarm_content + '</p>' + '</div>' + '<div class="mui-card-footer">' + '<p class="mui-card-link">广东省深圳市宝安区西乡街道保安达到</p>' + '</div>' + '</div>';
+				fragment.appendChild(li);
+			}
+			list.appendChild(fragment);
+		}
+
+		function sub(vlaue) {
+			var str = JSON.stringify(vlaue);
+			var a = str.substring(0, 4);
+			var b = str.substring(4, 6);
+			var c = str.substring(6, 8);
+			var d = str.substring(8, 10);
+			var e = str.substring(10, 12);
+			var f = str.substring(12, 14);
+			return a + "年" + b + "月" + c + "日" + d + "时" + e + "分" + f + "秒";
+		}
+
+		//		var pullRefresh = new auiPullToRefresh({
+		//			container: document.querySelector('.aui-refresh-content'),
+		//			triggerDistance: 100
+		//		},function(ret){
+		//			if(ret.status=="success"){
+		//				setTimeout(function(){
+		//					var wrap = document.getElementById("demo")
+		//					var lis = wrap.querySelectorAll('.aui-card-list');
+		//					for (var i = lis.length, length = i + 10; i < length; i++) {
+		//						var html = '<div class="aui-card-list">'+
+		//					            '<div class="aui-card-list-header">'+
+		//					                '卡片布局头部区域'+(i+1)+''+
+		//					            '</div>'+
+		//					            '<div class="aui-card-list-content-padded">'+
+		//					                '内容区域，卡片列表布局样式可以实现APP中常见的各类样式'+
+		//					            '</div>'+
+		//					            '<div class="aui-card-list-footer">'+
+		//					                '底部区域'+
+		//					            '</div>'+
+		//					        '</div>';
+		//						wrap.insertAdjacentHTML('afterbegin', html);
+		//					}
+		//					pullRefresh.cancelLoading(); //刷新成功后调用此方法隐藏
+		//				},1500)
+		//			}
+		//		})
+	</script>
+</html>

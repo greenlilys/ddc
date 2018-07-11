@@ -1,0 +1,350 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<title>底部导航</title>
+		<link rel="stylesheet" type="text/css" href="../css/api.css" />
+		<link rel="stylesheet" type="text/css" href="../css/style.css" />
+		<style>
+			header {
+				background-color: #f2f2f2;
+			}
+			header ul li {
+				height: 50px;
+				line-height: 50px;
+				text-align: center;
+				display: none;
+				color: #323237;
+				position: relative;
+				font-size: 18px;
+			}
+			header ul li.active {
+				display: block;
+			}
+			#footer {
+				background-color: #f2f2f2;
+			}
+			#footer ul li {
+				padding-top: 36px;
+				padding-bottom: 4px;
+				background: url() no-repeat center 2px;
+				background-size: auto 30px;
+				text-align: center;
+			}
+			#footer ul li.active {
+				color: #6ab494;
+			}
+			#footer ul li:nth-child(1) {
+				background-image: url(../image/ic_tab_location_normal.png);
+			}
+			#footer ul li:nth-child(2) {
+				background-image: url(../image/ic_tab_track_normal.png);
+			}
+			#footer ul li:nth-child(3) {
+				background-image: url(../image/ic_tab_msg_normal.png);
+			}
+			#footer ul li:nth-child(4) {
+				background-image: url(../image/ic_tab_me_normal.png);
+			}
+			#footer ul li:nth-child(1).active {
+				background-image: url(../image/ic_tab_location_selected.png);
+			}
+			#footer ul li:nth-child(2).active {
+				background-image: url(../image/ic_tab_track_selected.png);
+			}
+			#footer ul li:nth-child(3).active {
+				background-image: url(../image/ic_tab_msg_selected.png);
+			}
+			#footer ul li:nth-child(4).active {
+				background-image: url(../image/ic_tab_me_selected.png);
+			}
+			.flex-con {
+				overflow: auto
+			}
+		</style>
+	</head>
+	<body>
+		<!--<div id="wrap" class="flex-wrap flex-vertical">
+		<header>
+		<ul>
+		<li class="border-b active">位置</li>
+		<li class="border-b">轨迹</li>
+		<li class="border-b">消息</li>
+		<li class="border-b">我的</li>
+		</ul>
+		</header>
+		<div id="main" class="flex-con">
+		</div>
+		<div id="footer" class="border-t">
+		<ul class="flex-wrap">
+		<li tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con active">位置</li>
+		<li tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con">轨迹</li>
+		<li tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con">消息</li>
+		<li tapmode="hover" onclick="randomSwitchBtn( this );" class="flex-con">我的</li>
+		</ul>
+		</div>
+		</div>-->
+	</body>
+</html>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+	var NVTabBar;
+	apiready = function() {
+		tab();
+	};
+	function tab() {
+		var NVTabBar = api.require('NVTabBar');
+		NVTabBar.open({
+			styles : {
+				bg : '#ffffff', //（可选项）字符串类型；模块背景，支持 rgb、rgba、#、img；默认：#ffffff
+				h : 65, //（可选项）数字类型；模块的高度（含分割线）；默认：50
+				dividingLine : {//（可选项）JSON对象；模块顶部的分割线配置
+					width : 0, //（可选项）数字类型；分割线粗细；默认：0.5
+					color : '#000'//（可选项）字符串类型；分割线颜色；默认：#000
+				},
+				badge : {//（可选项）JSON对象；徽章样式配置；若不传则去内部字段默认值
+					bgColor : '#ff0', //（可选项）字符串类型；徽章背景色，支持rgb、rgba、#；默认：#ff0
+					numColor : '#fff', //（可选项）字符串类型；徽章数字字体颜色，支持rgb、rgba、#；默认：#fff
+					size : 6.0, //（可选项）数字类型；徽章半径大小；默认值：6.0
+					fontSize : 10, // (可选项) 数字类型;设置徽章字体大小;默认值: 10 ;注意:仅支持iOS。
+					centerX : 40, //（可选项）数字类型；徽章中心点坐标（相对于所属item的背景面板坐标系）；默认值：icon图标的右上角
+					centerY : 6//（可选项）数字类型；徽章中心点坐标（相对于所属item的背景面板坐标系）；默认值：icon图标的右上角
+				}
+			},
+			items : [{
+				w : api.winWidth / 4.0,
+				bg : {
+					marginB : 0,//（可选项）数字类型；子项背景距离模块底部的距离，设置大于0的数字可实现凸起效果；默认：0
+					//image : 'rgba(200,200,200,0.6)'//（可选项）字符串类型；子项的背景，支持rgb、rgba、#、img（仅支持本地图片路径fs://、widget://
+				},
+				iconRect : {//（可选项）JSON对象；子项按钮图标的大小配置，位置居中显示；默认值见内部字段
+					w : 25.0, //（可选项）数字类型；子项按钮图标的宽度；默认：25.0
+					h : 25.0,//（可选项）数字类型；子项按钮图标的宽度；默认：25.0
+				},
+				icon : {
+					normal : 'widget://image/ic_tab_location_normal.png',
+					highlight : 'widget://image/ic_tab_location_selected.png',
+					selected : 'widget://image/ic_tab_location_selected.png'
+				},
+				title : {
+					text : '位置', //（可选项）字符串类型；子项按钮下面的标题文字，若不传或传空则不显示
+					size : 12.0, //（可选项）数字类型；子项标题文字大小；默认：12.0
+					normal : '#696969', //（可选项）字符串类型；子项标题文字常态颜色；默认：#696969
+					selected : '#eb4f38', //（可选项）字符串类型；子项标题文字选中后颜色；默认：#ff0
+					marginB : 6.0 //（可选项）数字类型；子项标题距离模块下边缘的距离；默认：6.0
+					//ttf:'Alkatip Basma Tom'//（可选项）字符串类型；默认值：当前系统字体；
+				}
+			}, {
+				w : api.winWidth / 4.0,
+				bg : {
+					marginB : 0,
+					//image : 'rgba(200,200,200,0.7)'
+				},
+				iconRect : {
+					w : 25.0,
+					h : 25.0,
+				},
+				icon : {
+					normal : 'widget://image/ic_tab_location_normal.png',
+					highlight : 'widget://image/ic_tab_location_normal.png',
+					selected : 'widget://image/ic_tab_location_selected.png'
+				},
+				title : {
+					text : '轨迹',
+					size : 12.0,
+					normal : '#696969',
+					selected : '#eb4f38',
+					marginB : 6.0
+				}
+			}, {
+				w : api.winWidth / 4.0,
+				bg : {
+					marginB : 0,
+					//image : 'rgba(200,200,200,0.7)'
+				},
+				iconRect : {
+					w : 25.0,
+					h : 25.0,
+				},
+				icon : {
+					normal : 'widget://image/ic_tab_location_normal.png',
+					highlight : 'widget://image/ic_tab_location_normal.png',
+					selected : 'widget://image/ic_tab_location_selected.png'
+				},
+				title : {
+					text : '位置',
+					size : 12.0,
+					normal : '#696969',
+					selected : '#eb4f38',
+					marginB : 6.0
+				}
+			}, {
+				w : api.winWidth / 4.0,
+				bg : {
+					marginB : 0,
+					//image : 'rgba(200,20,0,0.6)'
+				},
+				iconRect : {
+					w : 25.0,
+					h : 25.0,
+				},
+				icon : {
+					normal : 'widget://image/ic_tab_location_normal.png',
+					highlight : 'widget://image/ic_tab_location_normal.png',
+					selected : 'widget://image/ic_tab_location_selected.png'
+				},
+				title : {
+					text : '我的',
+					size : 12.0,
+					normal : '#696969',
+					selected : '#eb4f38',
+					marginB : 6.0
+				}
+			}],
+			selectedIndex : 0
+		}, function(ret, err) {
+			switch(ret.index) {
+				case 0:
+					api.openFrame({
+						name : 'frame0',
+						url : '../html/frame0.html',
+						bounces : false,
+						rect : {
+							x : 0,
+							y : 15,
+							w : 'auto',
+							h : api.winHeight - 75
+						}
+					});
+					break;
+				case 1:
+					api.openFrame({
+						name : 'frame1',
+						url : '../html/frame1.html',
+						bounces : false,
+						rect : {
+							x : 0,
+							y : 15,
+							w : 'auto',
+							h : api.winHeight - 75
+						}
+					});
+					break;
+				case 2:
+					api.openFrame({
+						name : 'frame2',
+						url : '../html/frame2.html',
+						bounces : false,
+						rect : {
+							x : 0,
+							y : 15,
+							w : 'auto',
+							h : api.winHeight - 75
+						}
+					});
+					break;
+				case 3:
+					api.openFrame({
+						name : 'frame3',
+						url : '../html/frame3.html',
+						bounces : false,
+						rect : {
+							x : 0,
+							y : 15,
+							w : 'auto',
+							h : api.winHeight - 75
+						}
+					});
+					break;
+				default:
+					api.openFrame({
+						name : 'frame0',
+						url : '../html/frame0.html',
+						bounces : false,
+						rect : {
+							x : 0,
+							y : 15,
+							w : 'auto',
+							h : api.winHeight - 75
+						}
+					});
+			}
+			
+		});
+	}
+
+	//  var body_h = $api.offset($api.dom('body')).h;
+	//
+	//  apiready = function() {
+	//      $api.fixStatusBar($api.dom('header'));
+	//      api.setStatusBarStyle({
+	//          style: 'dark',
+	//          color: '#6ab494'
+	//      });
+	//      funIniGroup();
+	//  }
+	//
+	//  function funIniGroup() {
+	//      var eHeaderLis = $api.domAll('header li'),
+	//          frames = [];
+	//      for (var i = 0, len = eHeaderLis.length; i < len; i++) {
+	//          frames.push({
+	//              name: 'frame' + i,
+	//              url: 'frame' + i + '.html',
+	//              bgColor: 'rgba(0,0,0,.2)',
+	//              bounces: false
+	//          })
+	//      }
+	//      api.openFrameGroup({
+	//          name: 'group',
+	//          scrollEnabled: false,
+	//          rect: {
+	//              x: 0,
+	//              y: 5,
+	//              w: api.winWidth,
+	//              h: api.winHidth-55
+	//          },
+	//          index: 0,
+	//          frames: frames
+	//      }, function(ret, err) {
+	//
+	//      });
+	//  }
+	//
+	//  // 随意切换按钮
+	//  function randomSwitchBtn(tag) {
+	//
+	//      if (tag == $api.dom('#footer li.active')) return;
+	//      var eFootLis = $api.domAll('#footer li'),
+	//          eHeaderLis = $api.domAll('header li'),
+	//          index = 0;
+	//      var tmp = null;
+	//      for (var i = 0, len = eFootLis.length; i < len; i++) {
+	//          if (tag == eFootLis[i]) {
+	//              index = i;
+	//              if (index != 0) {
+	//                  // api.execScript({
+	//                  //     frameName: 'demo_mark_frm',
+	//                  //     script: 'hide()'
+	//                  // })
+	//              } else {
+	//                  // api.execScript({
+	//                  //     frameName: 'demo_mark_frm',
+	//                  //     script: 'show()'
+	//                  // })
+	//              }
+	//          } else {
+	//              $api.removeCls(eFootLis[i], 'active');
+	//              $api.removeCls(eHeaderLis[i], 'active');
+	//          }
+	//      }
+	//      $api.addCls(eFootLis[index], 'active');
+	//      $api.addCls(eHeaderLis[index], 'active');
+	//      api.setFrameGroupIndex({
+	//          name: 'group',
+	//          index: index
+	//      });
+	//  }
+</script>

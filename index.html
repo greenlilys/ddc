@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="css/normalize.css" />
+	<link rel="stylesheet" type="text/css" href="css/default.css">
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<style type="text/css">
+		.login__row {
+			height: 60px;
+			padding-top: 0;
+			border: 1px solid;
+			margin-bottom: 5px;
+			border-radius: 7px;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="cont">
+		<div class="demo">
+			<div class="login">
+				<div class="login__check">
+					<img id="img" src="image/ic_logo.jpg" />
+				</div>
+				<div class="login__form">
+					<div class="login__row">
+						<svg class="login__icon name svg-icon" viewBox="0 0 20 20">
+								<path d="M0,20 a10,8 0 0,1 20,0z M10,0 a4,4 0 0,1 0,8 a4,4 0 0,1 0,-8">
+							</svg>
+						<input id="account" type="text" class="login__input name" placeholder="请输入手机号码" value="18010570926" />
+					</div>
+					<div class="login__row">
+						<svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
+								<path d="M0,20 20,20 20,8 0,8z M10,13 10,16z M4,8 a6,8 0 0,1 12,0">
+							</svg>
+						<input id="password" type="password" class="login__input pass" placeholder="请输入密码" value="654321" />
+					</div>
+					<button type="button" class="login__submit" style="height: 48px;" onclick="fnLogin();">
+							登 录
+						</button>
+				</div>
+			</div>
+			<div class="app"></div>
+		</div>
+	</div>
+	<script type="text/javascript" src="script/api.js"></script>
+	<script src="script/md5.min.js" type="text/javascript" charset="utf-8"></script>
+	<script>
+		var account = $api.val($api.byId('account'));
+		var password = $api.val($api.byId('password'));
+		var hash = md5(password);
+		var mall = {
+			"func": "1001", //登录
+			"account": account, //账号
+			"password": hash, //密码123456 加密后
+			"user": '1', //1普通用户
+			"system": "ios" //ios端
+		}
+		apiready = function() {
+			api.parseTapmode();
+		};
+
+		function fnLogin() {
+			api.ajax({
+				url: "http://47.98.166.93:8800/gps-api/api",
+				method: 'post',
+				timeout: 30,
+				dataType: 'json',
+				returnAll: false,
+				data: {
+					values: {
+						param: JSON.stringify(mall),
+						sign: "123"
+					}
+				}
+			}, function(ret, err) {
+				if (ret) {
+					var code = ret.code;
+					if (code == 1) {
+						$api.setStorage('mobile', ret.mobile); //我的手机
+						$api.setStorage('name', ret.name); //我名字
+						$api.setStorage('sfz', ret.sfz); //我的身份证
+						$api.setStorage('token', ret.token); //用户令牌
+						$api.setStorage('user_id', ret.user_id); //用户ID
+						api.openWin({
+							name: 'home', //描述：window 名字，不能为空字符串
+							url: 'html/home.html', //描述：页面地址，可以为本地文件路径，支持相对路径和绝对路径，以及 widget://、fs://等协议路径，也可以为远程地址
+						});
+					}
+				}
+			})
+		}
+		//			$api.setStorage(‘name’,’key’);//设置
+		//			$api.getStorage(‘name’);//获得指定name的值
+		//			$api.rmStorage(‘name’);//清除指定name的值
+		//			$api.clearStorage();//清楚全部本地数据
+	</script>
+</body>
+
+</html>

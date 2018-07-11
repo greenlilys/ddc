@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <title>悬浮图标</title>
+    <style>
+        body {
+            background: transparent;
+            padding: 0;
+            margin: 0;
+        }
+
+        .icon {
+            background: transparent url('../image/sostel@2x.png') 0 0 no-repeat;
+            background-size: 50px 50px;
+            display: block;
+            border-radius: 50px;
+            height: 50px;
+            width: 50px;
+            position: relative;
+            z-index: 998;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="iconBox" style="border-radius:50px;">
+        <span class="icon" @click="openCarList"></span>
+    </div>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/vue.min.js"></script>
+    <script>
+    var vm = new Vue({
+      el:"#iconBox",
+      data:{
+
+      },
+      methods:{
+        openCarList:function(){
+          api.openFrame({
+              name: 'carList_fra',
+              url: 'widget://html/carList_fra.html',
+              rect: {
+                  x: 0,
+                  y: 0,
+                  w: 'auto',
+                  h: 'auto'
+              },
+              animation: {
+                  type: "reveal", //动画类型（详见动画类型常量）
+                  subType: "from_right", //动画子类型（详见动画子类型常量）
+                  duration: 500
+              },
+              pageParam: {
+
+              },
+              reload: false,
+              bounces: false,
+              vScrollBarEnabled: false,
+              hScrollBarEnabled: false
+          });
+        }
+      }
+    })
+    apiready = function(){
+
+    }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+	<title>APP</title>
+	<link rel="stylesheet" type="text/css" href="../css/aui.css" />
+</head>
+<style type="text/css">
+	body {
+		background-color: #ffffff;
+	}
+</style>
+
+<body></body>
+<div class="">
+</div>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript">
+	var aMap, curlon, curlat;
+
+	apiready = function() {
+		//引入模块
+		aMap = api.require('aMap');
+		// api.showProgress({
+		// 	style: 'default',
+		// 	animationType: 'fade',
+		// 	title: '我在定位中...',
+		// 	text: '请稍候...',
+		// 	modal: false
+		// });
+		//打开地图
+		openMap();
+		//定位getLocation();
+		setInterval("getLocation()", 8000);
+	};
+  function show(){
+    aMap.show();
+  }
+  function hide(){
+    aMap.hide();
+  }
+	//打开地图
+	openMap = function() {
+
+			aMap.setMapAttr({
+				type: 'standard',
+				trafficOn: true,
+				building: true,
+			});
+
+			aMap.open({
+				rect: {
+					x: 0,
+					y: 0,
+					w: 'auto',
+					h: api.frameHeight
+				},
+				showUserLocation: true,
+				zoomLevel: 16,
+				/*center: {
+					 lon: 116.4021310000,
+					 lat: 39.9994480000
+				},*/
+				fixedOn: api.frameName,
+				fixed: true
+			}, function(ret, err) {
+				if (ret.status) {
+					//alert("地图已成功打开");
+				} else {
+				//	alert(JSON.stringify(err));
+				}
+			});
+
+
+
+		}
+		//获取用户当前经纬度。
+	getLocation = function() {
+		aMap.getLocation({
+			autoStop: true,
+		}, function(ret, err) {
+			api.hideProgress();
+			if (ret.status) {
+		//	console.log( JSON.stringify( ret ) );
+				if ((curlon != ret.lon) || (curlat != ret.lat)) {
+
+					curlon = ret.lon;
+					curlat = ret.lat;
+					//设置地图中心
+					aMap.setCenter({
+						coords: {
+							lon: curlon,
+							lat: curlat
+						},
+						animation: true
+					});
+					aMap.showUserLocation({
+						isShow: true
+					}); //显示用户位置
+					aMap.setTrackingMode({
+						animation: true,
+						trackingMode: 'follow'
+					});
+				}
+			} else {
+				console.log(err.code);
+			}
+		});
+	}
+</script>
+
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>个人信息</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!--标准mui.css-->
+    <link rel="stylesheet" href="../css/mui.min.css">
+    <!--App自定义的css-->
+    <link rel="stylesheet" type="text/css" href="../css/app.css" />
+    <style type="text/css">
+        .mui-card-footer:before,
+        .mui-card-header:after {
+            position: absolute;
+            top: auto;
+            bottom: 0;
+            right: 0;
+            left: 0;
+            height: 1px;
+            content: '';
+            -webkit-transform: scaleY(.5);
+            transform: scaleY(.5);
+            background-color: #c8c7cc;
+        }
+
+        #img {
+            text-align: center;
+            border-radius: 20px;
+            width: 35px;
+            height: 35px;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        .mui-card {
+            margin: 0;
+            margin-top: 0!important;
+        }
+
+        .mui-card-footer,
+        .mui-card-header {
+            min-height: 54px;
+        }
+
+        .mui-table-view-cell:after {
+            left: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mui-content">
+        <div class="mui-card">
+            <div class="mui-card-header mui-card-media" style="height:55vw;background-image:url(../image/me_banner_bg.png)">
+                <img id="img" src="../image/bottombtn0102.png" />
+            </div>
+            <div class="mui-card-footer">
+                <p class="mui-card-link">姓名</p>
+                <p class="mui-card-link" style="color: #000" id="name"></p>
+            </div>
+            <div class="mui-card-footer">
+                <p class="mui-card-link">身份证</p>
+                <p class="mui-card-link" style="color: #000" id="sfz">
+                </p>
+            </div>
+            <div class="mui-card-footer">
+                <p class="mui-card-link">手机号码</p>
+                <p class="mui-card-link" style="color: #000" id="mobile">
+                </p>
+            </div>
+        </div>
+        <div class="mui-card">
+            <ul id="list" class="mui-table-view mui-table-view-chevron">
+                <li class="mui-table-view-cell" id="mcar" onclick="car();">
+                    <a class="mui-navigate-right">
+							我的车辆
+						</a>
+                </li>
+                <li class="mui-table-view-cell" id="modify" onclick="pass();">
+                    <a class="mui-navigate-right">
+							修改密码
+						</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    </script>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript">
+        apiready = function() {
+            api.parseTapmode();
+            var mobile = $api.getStorage('mobile');
+            var name = $api.getStorage('name');
+            var sfz = $api.getStorage('sfz');
+            $api.html($api.byId('mobile'),mobile);
+            $api.html($api.byId('name'),name);
+            $api.html($api.byId('sfz'),sfz);
+        }
+
+        function car() {
+            api.openWin({
+                name: 'pull_refresh_win', //描述：window 名字，不能为空字符串
+                url: 'pull_refresh_win.html', //描述：页面地址，可以为本地文件路径，支持相对路径和绝对路径，以及 widget://、fs://等协议路径，也可以为远程地址
+            });
+        }
+
+        function pass() {
+            api.openWin({
+                name: 'modifypassword', //描述：window 名字，不能为空字符串
+                url: 'modifypassword.html', //描述：页面地址，可以为本地文件路径，支持相对路径和绝对路径，以及 widget://、fs://等协议路径，也可以为远程地址
+            });
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+    <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+    <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+    <title>车辆详情</title>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+        }
+        html {
+      		font-family: "Microsoft YaHei", Helvetica, sans-serif;
+      		font-size: 1rem;
+      	}
+        body {
+            background: rgba(0, 0, 0, 0);
+        }
+
+        #content {
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .5);
+            padding-top:3rem;
+        }
+        .box{
+          width:70%;
+          height:11rem;
+          margin:0 auto;
+          padding:0.5rem;
+          background:#EFEFEF;
+        }
+        .closeBox{
+          width:100%;  display:flex;  flex-direction: row;  align-items: center;  justify-content: center;margin-top:2rem;
+        }
+        .icon-close {
+          width: 40px; height: 40px; color: #fff; line-height: 40px; text-align: center; border-radius: 50%; font-size:30px; border: 1px solid #fff;
+        }
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="content" v-clock>
+        <div class="box">
+            <div style="display:flex;flex-direction:row;">
+                <span style="width:46px;text-align:left;font-size:0.9rem;height:1rem;line-height:1rem;color:#747474;">车牌</span>
+                <span style="flex:1;font-size:1rem;height:1rem;line-height:1rem">{{carNum}}</span>
+              </div>
+
+            <div style="display:flex;flex-direction:row;margin-top:6px;">
+                <div style="width:46px;text-align:left;font-size:0.9rem;color:#747474;">位置</div>
+                <div style="flex:1;font-size:1rem;line-height:1.1rem;text-align:justify;">{{address}}</div>
+            </div>
+
+            <div style="display:flex;flex-direction:row;margin-top:6px;">
+                <span style="width:46px;text-align:left;font-size:0.9rem;height:1rem;line-height:1rem;color:#747474;">速度</span>
+                <span style="flex:1;font-size:1rem;height:1rem;line-height:1rem">{{speed}}</span>
+            </div>
+
+            <div style="display:flex;flex-direction:row;margin-top:8px;justify-content:space-around;">
+                <span style="font-size:1.1rem;color:#E6383E;font-weight:bold;">{{online}}</span>
+                <span style="font-size:1.1rem;font-weight:bold;">{{isPark}}</span>
+                <span style="font-size:1.1rem;color:#E5A554;font-weight:bold;">{{status}}</span>
+            </div>
+
+            <div style="display:flex;flex-direction:row;margin-top:6px;justify-content:space-between;">
+                <div @click="" style="width:6rem;background:#23B3F3;height:2rem;border-radius:4px;text-align:center;line-height:2rem;color:#fff;">原地布防</div>
+                <div @click="" style="width:6rem;background:#23B3F3;height:2rem;border-radius:4px;text-align:center;line-height:2rem;color:#fff;">原地撤防</div>
+            </div>
+
+        </div>
+        <div class="closeBox">
+            <i class="aui-iconfont aui-icon-close icon-close" @click="closeCarinfo"></i>
+        </div>
+    </div>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script type="text/javascript" src="../script/vue.min.js"></script>
+    <script>
+        var vm = new Vue({
+            el: "#content",
+            data: {
+                aMap :'',
+                carInfoList: "",
+                id: '',
+                carNum: "",
+                address: "",
+                speed: "",
+                online: "",
+                isPark: "",
+                status: ""
+            },
+            methods: {
+              init:function(){
+                vm.bindInfo();
+              },
+                bindInfo: function() {
+                    var carInfoList = vm.carInfoList;
+                    var id = vm.id;
+                    var carInfo =[];
+                    carInfoList.forEach(function(item){
+                    carInfo.push({
+                    	id:item.id,
+                    	carNum:item.carno,
+                      lon:item.lng,
+                      lat:item.lat,
+                    	speed:item.speed,
+                    	status:item.status,
+                    	online:item.online
+                    })
+                    });
+
+                    //获取当前速度等其它数据
+                    for (var j = 0; j < carInfo.length; j++) {
+                        if (id == carInfo[j].id) {
+                            vm.carNum = carInfo[j].carNum;
+                            vm.speed = carInfo[j].speed;
+                            vm.status = carInfo[j].status;
+                            vm.online = carInfo[j].online == "1" ? "在线" : "离线";
+                            vm.isPark = (carInfo[j].speed +"").charAt(0) == "0" ? "已停车" : "运行中";
+                            vm.aMap.getNameFromCoords({
+                                lon: carInfo[j].lon,
+                                lat: carInfo[j].lat
+                            }, function(ret, err) {
+                                if (ret.status) {
+                                    console.log(JSON.stringify(ret));
+                                    vm.address = ret.address;
+                                    console.log(vm.address);
+                                } else {
+                                    alert(JSON.stringify(err));
+                                }
+                            });
+                        }
+                    };
+                },
+
+                closeCarinfo: function() {
+                    api.setFrameAttr({
+                        name: 'carinfo_fra',
+                        hidden: true
+                    });
+                }
+            }
+        })
+        apiready = function() {
+          vm.aMap = api.require('aMap');
+            console.log(JSON.stringify(api.pageParam));
+            vm.carInfoList = api.pageParam.carInfoList;
+            vm.id = api.pageParam.id;
+            console.log(api.pageParam.id);
+            vm.init();
+
+
+        }
+    </script>
+</body>
+
+</html>

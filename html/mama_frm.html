@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="zh">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="../css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="../css/default.css">
+    <link rel="stylesheet" type="text/css" href="../css/styles.css">
+    <style type="text/css">
+        .login__row {
+            height: 60px;
+            padding-top: 0;
+            border: 1px solid;
+            margin-bottom: 5px;
+            border-radius: 7px;
+        }
+
+        .login__form {
+            position: absolute;
+            top: 44px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cont">
+        <div class="demo">
+            <div class="login">
+                <div class="login__form">
+                    <div class="login__row">
+                        <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
+								<path d="M0,20 20,20 20,8 0,8z M10,13 10,16z M4,8 a6,8 0 0,1 12,0" />
+							</svg>
+                        <input type="password" value="" id="old_password" name="old_password" class="login__input pass" placeholder="请输入旧密码" />
+                    </div>
+                    <div class="login__row">
+                        <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
+								<path d="M0,20 20,20 20,8 0,8z M10,13 10,16z M4,8 a6,8 0 0,1 12,0" />
+							</svg>
+                        <input type="password" value="" id="new_password1" name="new_password1" class="login__input pass" placeholder="请输入新密码" />
+                    </div>
+                    <div class="login__row">
+                        <svg class="login__icon pass svg-icon" viewBox="0 0 20 20">
+								<path d="M0,20 20,20 20,8 0,8z M10,13 10,16z M4,8 a6,8 0 0,1 12,0" />
+							</svg>
+                        <input type="password" value="" class="login__input pass" placeholder="请再次输入新密码" />
+                    </div>
+                    <button type="button" id="new_password2" name="new_password2" class="login__submit" style="height: 48px;" onclick="fnLogin();">确 定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="../script/api.js"></script>
+    <script src="../script/md5.min.js" type="text/javascript" charset="utf-8"></script>
+    <script>
+        var old_password = $api.byId("old_password").value;
+        var new_password1 = $api.byId("new_password1").value;
+        var mobile = $api.getStorage('mobile'); //我的手机
+        var name = $api.getStorage('name'); //我名字
+        var sfz = $api.getStorage('sfz'); //我的身份证
+        var token = $api.getStorage('token'); //用户令牌
+        var user_id = $api.getStorage('user_id'); //用户ID
+        var old = md5(old_password);
+        var neww = md5(new_password1);
+        var mall = {
+            "func": "1008",
+            "token": token, //用户令牌
+            "user_id": user_id, //用户令牌
+            "old_password": old, //旧密码  MD5
+            "new_password": neww, //新密码  MD5
+        }
+        apiready = function() {
+            api.parseTapmode();
+        };
+
+        function fnLogin() {
+            api.ajax({
+                url: "http://47.98.166.93:8800/gps-api/api",
+                method: 'post',
+                timeout: 30,
+                dataType: 'json',
+                returnAll: false,
+                data: {
+                    values: {
+                        param: JSON.stringify(mall),
+                        sign: "123"
+                    }
+                }
+            }, function(ret, err) {
+                if (ret) {
+                    if (code == 1) {
+                        tuichu();
+                    }
+                    var code = ret.code;
+                    alert(JSON.stringify(ret))
+                }
+            })
+        }
+        function tuichu() {
+                        api.toast({
+                                msg : '成功退出',
+                                duration : 3000,
+                                location : 'bottom'
+                        });
+                        $api.clearStorage();
+                        api.openWin({
+                                reload : true,
+                                name : 'login',
+                                url : 'win_login.html',
+                                vScrollBarEnabled : false,
+                                animation : {
+                                        type : "cube",
+                                        subType : "from_bottom",
+                                        duration : 800
+                                }
+                        });
+                        api.closeWin({
+                                name : 'index'
+                        });
+                }
+        //			$api.setStorage(‘name’,’key’);//设置
+        //			$api.getStorage(‘name’);//获得指定name的值
+        //			$api.rmStorage(‘name’);//清除指定name的值
+        //			$api.clearStorage();//清楚全部本地数据
+    </script>
+</body>
+
+</html>

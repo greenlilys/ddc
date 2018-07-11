@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+  <meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+  <link rel="stylesheet" type="text/css" href="../css/aui.css" />
+  <title>车辆列表</title>
+  <style>
+  html, body {
+      width: 100%;
+      height: 100%;
+  }
+  html {
+    font-family: "Microsoft YaHei", Helvetica, sans-serif;
+    font-size: 1rem;
+  }
+  ul{
+    margin:0;
+    padding:0;
+  }
+  .border-t,.border-b {position: relative;}
+  .border-t:before,.border-b:after {content: '';position: absolute;left: 0;top: 0;background: #ddd;right: 0;height: 1px;-webkit-transform: scaleY(0.5);
+      transform: scaleY(0.5);-webkit-transform-origin: 0 0;transform-origin: 0 0;}
+  .border-b:after {top: auto;bottom: 0;}
+  body {
+      background: transparent;
+      padding: 0;
+      margin: 0;
+  }
+  li:active{
+    background:#F5F5F5;
+  }
+  #content {
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, .5);
+      padding-top:2rem;
+  }
+
+  [v-cloak] {
+      display: none;
+  }
+  .listBox{
+    width:80%;
+    background:#fff;
+    height:70%;
+    border-radius: 10px;
+    padding:10px;
+    box-sizing: border-box;
+    margin:0 auto;
+  }
+  ul{width:100%;height:100%;overflow: auto;}
+  .closeBox{
+    width:100%;  display:flex;  flex-direction: row;  align-items: center;  justify-content: center;margin-top:2rem;
+  }
+  .icon-close {
+    width: 40px; height: 40px; color: #fff; line-height: 40px; text-align: center; border-radius: 50%; font-size:30px; border: 1px solid #fff;
+  }
+  .infoItem{ display:flex; flex-direction: row; align-items: center; height:3rem;}
+  .imgBox,.carNum,.isOnline{ flex:1;}
+  .carNum,.isOnline{font-size: 1rem;line-height: 3rem;}
+  .carNum{text-align: center;}
+  .isOnline{text-align:center;}
+  .imgBox img{display:inline-block;width:1.4rem;height:1.4rem;}
+  .imgBox{display:flex; flex-direction: row; align-items: center;justify-content: center;}
+
+  </style>
+</head>
+<body>
+  <div id="content" v-cloak>
+    <div class="listBox">
+      <ul>
+        <li class="infoItem border-b" v-for="item in carInfoList">
+            <div class="imgBox"><img src="../image/ic_motor_bike.png" alt=""></div>
+            <div class="carNum">{{item.carno}}</div>
+            <div class="isOnline">离线</div>
+        </li>
+
+      </ul>
+    </div>
+    <div class="closeBox">
+        <i class="aui-iconfont aui-icon-close icon-close" @click="closeCarinfo"></i>
+    </div>
+  </div>
+  <script type="text/javascript" src="../script/api.js"></script>
+  <script type="text/javascript" src="../script/vue.min.js"></script>
+  <script>
+  var vm = new Vue({
+    el:"#content",
+    data:{
+      carInfoList:""
+    },
+    methods:{
+      init:function(){
+
+      },
+      getCarInfoList:function(){
+        var mall = {
+          "func": 1002,
+          "token": $api.getStorage('token'),
+          "user_id": $api.getStorage('user_id')
+        }
+        api.ajax({
+          url: "http://47.98.166.93:8800/gps-api/api",
+          method: 'post',
+          dataType: 'json',
+          timeout: 30,
+          returnAll: false,
+          data: {
+            values: {
+              param: JSON.stringify(mall),
+              sign: "123"
+            }
+          }
+        }, function(ret, err) {
+          if (ret) {
+            // 成功返回
+            console.log('返回数据:' + JSON.stringify(ret));
+            vm.carInfoList = ret.list;
+          } else {
+
+          }
+        })
+      },
+      closeCarinfo: function() {
+          api.setFrameAttr({
+              name: 'carList_fra',
+              hidden: true
+          });
+      }
+    }
+  })
+  apiready = function(){
+
+  }
+  </script>
+</body>
+</html>

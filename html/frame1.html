@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
+		<meta name="format-detection" content="telephone=no,email=no,date=no,address=no">
+		<link rel="stylesheet" href="../css/mui.min.css">
+	</head>
+	<style>
+		.table {
+			color: #666;
+		}
+		.table th {
+			background-repeat: repeat-x;
+			height: 30px;
+		}
+		.table td, .table th {
+			padding: 7px 1em 10px;
+			text-align: center;
+		}
+		.table tr.alter {
+			background-color: #f5fafe;
+		}
+	</style>
+	<body>
+		<div class="mui-content" style="padding-top: 20px;">
+			<form class="" style="padding: 10px;">
+				<div class="mui-input-row" style="margin-bottom: 5px;">
+					<label style="width: 78px;padding: 11px 3px;">选择车辆</label>
+					<div id='showUserPicker' onclick="UIMultiSelector()" class="mui-icon mui-icon mui-icon-arrowdown mui-right" type='button' style="width: calc(100% - 78px);border: 1px solid;padding: 11px 15px;line-height: 1.1;font-size: 16px;">
+						请选择车辆
+					</div>
+					<input type="hidden" class="" id="car_id" placeholder="请输入用户名">
+				</div>
+				<div class="mui-input-row">
+					<label style="width: 78px;padding: 11px 3px;">选择日期</label>
+					<div id="tame" type="button" class="mui-icon mui-icon mui-icon-arrowdown mui-right" onclick="pickDate()" style="width: calc(100% - 78px);border: 1px solid;padding: 11px 15px;line-height: 1.1;font-size: 16px;">
+						请选择日期
+					</div>
+					<input type="hidden" class="" id="time" placeholder="请输入密码">
+				</div>
+			</form>
+		</div>
+		<div class="mui-content" style="margin: 10px;padding: 10px 0;border-radius: 5px;border: 1px solid #cad9ea;">
+			<table width="100%" class="table" id="tablevalue">
+				<tr>
+					<td><span id="date_time">0h</span></td>
+					<td><span id="date_mileage">0</span>km</td>
+					<td><span id="shudu">0</span>km/h</td>
+				</tr>
+				<tr>
+					<th width=33%>行驶时间</th>
+					<th width=33%>本日里程</th>
+					<th width=33%>平均速度</th>
+				</tr>
+			</table>
+		</div>
+		<div class="mui-content" style="margin: 10px;padding: 10px 0;border-radius: 5px;">
+			<button id="lishi" type="button" class="mui-btn mui-btn-primary mui-btn-block" style="font-size: 16px;padding: 10px 0;">
+				点击查看历史回放
+			</button>
+		</div>
+		<div class="mui-content" style="margin: 10px;padding: 10px 0;border-radius: 5px;border: 1px solid #cad9ea;">
+			<table width="100%" class="table" id="tablevalue">
+				<tr>
+					<td><span id="total_time">0h</span></td>
+					<td><span id="total_mileage">0km</span></td>
+				</tr>
+				<tr>
+					<th width=50%>总行驶时间</th>
+					<th width=50%>总行驶里程</th>
+				</tr>
+			</table>
+		</div>
+	</body>
+	<script type="text/javascript" src="../script/api.js"></script>
+	<script type="text/javascript">
+		var mobile = $api.getStorage('mobile');
+		//我的手机
+		var name = $api.getStorage('name');
+		//我名字
+		var sfz = $api.getStorage('sfz');
+		//我的身份证
+		var token = $api.getStorage('token');
+		//用户令牌
+		var user_id = $api.getStorage('user_id');
+		//用户ID
+		var shopList1 = [];
+		apiready = function() {
+			ajax();
+		};
+		function ajax() {
+			var mall = {
+				"func" : "1002", //车辆信息
+				"token" : token, //账号
+				"user_id" : user_id, //密码123456 加密后
+			}
+			api.ajax({
+				url : "http://47.98.166.93:8800/gps-api/api",
+				method : 'post',
+				timeout : 30,
+				dataType : 'json',
+				returnAll : false,
+				data : {
+					values : {
+						param : JSON.stringify(mall),
+						sign : "123"
+					}
+				}
+			}, function(ret, err) {
+				if (ret) {
+					var code = ret.code;
+					if (code == 1) {
+						var list = ret.list;
+						//可以选择的列表实际上是一个数组。我们用shopList1来表
+						//alert(JSON.stringify(ret))
+						//listone(dat);
+						for (var i = 0; i < list.length; i++) {
+							shopList1.push({
+								text : list[i].carno,
+								status : list[i].id //mui给的例子中只写了value和text。实际上我们可以写很多自己命名的变量
+							})
+						}
+					}
+				}
+			})
+		}
+
+		function UIMultiSelector() {
+			var UIMultiSelector = api.require('UIMultiSelector');
+			UIMultiSelector.open({
+				rect : {
+					h : 240
+				},
+				text : {
+					title : '请选择车辆',
+					leftBtn : '取消',
+					rightBtn : '确定',
+				},
+				singleSelection : true,
+				styles : {
+					bg : '#fff', //（可选项）字符串类型；主体的背景，支持 rgb，rgba，#，widget://，fs://；默认：#fff
+					mask : 'rgba(0,0,0,0.2)', //（可选项）字符串类型；遮罩层的背景，支持 rgb、rgba、#、img；默认：rgba(0,0,0,0)
+					title : {//（可选项）JSON 类型；标题栏样式；默认：见内部字段
+						bg : '#fff', //（可选项）字符串类型；标题栏的背景，支持 rgb、rgba、#、img；默认：#ddd
+						color : '#333', //（可选项）字符串类型；标题字体颜色，支持 rgb、gba、#；默认：#444
+						size : 16, //（可选项）数字类型；标题字体大小；默认：16
+						h : 40 //（可选项）数字类型；标题栏的高度；默认：44
+					},
+					leftButton : {//（可选项）JSON 类型；左上角按钮样式；默认：见内部字段
+						bg : 'rgba(0,0,0,0)', //（可选项）字符串类型；按钮的背景，支持 rgb、rgba、#、img；默认：#f00
+						w : 80, //（可选项）数字类型；按钮的宽度；默认：80
+						h : 36, //（可选项）数字类型；按钮的高度；默认：35
+						marginT : 2, //（可选项）数字类型；按钮的上边距；默认：5
+						marginL : 5, //（可选项）数字类型；按钮的左边距；默认：8
+						color : '#999', //（可选项）字符串类型；按钮的文字颜色，支持 rgb、rgba、#；默认：#fff
+						size : 14 //（可选项）数字类型；按钮的文字大小；默认：14
+					},
+					rightButton : {//（可选项）JSON 类型；右上角按钮样式；默认：见内部字段
+						bg : 'rgba(0,0,0,0)', //（可选项）字符串类型；按钮的背景，支持 rgb、rgba、#、img；默认：#0f0
+						w : 80, //（可选项）数字类型；按钮的宽度；默认：80
+						h : 36, //（可选项）数字类型；按钮的高度；默认：35
+						marginT : 2, //（可选项）数字类型；按钮的上边距；默认：5
+						marginR : 5, //（可选项）数字类型；按钮的右边距；默认：8
+						color : '#16a085', //（可选项）字符串类型；按钮的文字颜色，支持 rgb、rgba、#；默认：#fff
+						size : 14 //（可选项）数字类型；按钮的文字大小；默认：14
+					},
+					item : {//（可选项）JSON 类型；每个选项的样式；默认：见内部字段
+						h : 40, //（可选项）数字类型；按钮的高度；默认：35
+						bg : '#fff', //（可选项）字符串类型；选项的背景，支持 rgb、rgba、#、img；默认：#fff
+						bgActive : '#f4f4f4', //（可选项）字符串类型；已选中选项的背景，支持 rgb、rgba、#、img；默认：bg
+						bgHighlight : '#f4f4f4', //（可选项）字符串类型；选项的高亮背景，支持 rgb、rgba、#、img；默认：bg
+						color : '#666', //（可选项）字符串类型；选项的文字颜色，支持 rgb，rgba，#；默认：#444
+						active : '#16a085', //（可选项）字符串类型；已选中选项的文字颜色，支持 rgb、rgba、#；默认：color
+						highlight : '#16a085', //（可选项）字符串类型；选项的高亮文字颜色，支持 rgb、rgba、#；默认：color
+						size : 14, //（可选项）数字类型；选项的文字大小；默认：14
+						lineColor : '#e6e6e6', //（可选项）字符串类型；分隔线的颜色，支持 rgb、rgba、#；默认：rgba(0,0,0,0)
+						textAlign : 'center' //（可选项）字符串类型；选项文字的对齐方式，'left|center|right'，当值为 left 或 right 时文字会根据情况空留 icon 已占的位置；默认：left
+					},
+					icon : {
+						w : 0,
+						h : 0,
+						marginT : 0,
+						marginH : 0,
+						bg : '#f4f4f4',
+						align : 'left'
+					}
+				},
+				animation : false,
+				items : [{
+					text : '请选择',
+					status : 'normal',
+					index : ''
+				}, {
+					text : '一级',
+					status : 'normal',
+					index : 1
+				}, {
+					text : '二级',
+					status : 'normal',
+					index : 2
+				}, {
+					text : '三级',
+					status : 'selected',
+					index : 3
+				}]
+			}, function(ret, err) {
+				if (ret) {
+					if (ret.eventType == "clickLeft") {
+						UIMultiSelector.close();
+					} else if (ret.eventType == "clickRight") {
+						if (ret.items.length > 0) {
+							if (hn.isFunction(callback)) {
+								callback(ret);
+							}
+						}
+						UIMultiSelector.close();
+					}
+				} else {
+				}
+			});
+		}
+
+		function toDoRequest() {
+		}
+
+		function closeWin() {
+			api.closeWin({
+			});
+		}
+	</script>
+</html>

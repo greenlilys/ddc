@@ -1,0 +1,228 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+	<title>APP</title>
+	<link rel="stylesheet" type="text/css" href="../css/aui.css" />
+</head>
+<style type="text/css">
+	body {
+		background-color: #ffffff;
+	}
+
+	html,
+	body {
+		width: 100%;
+		height: 100%;
+	}
+
+	html {
+		font-family: "Microsoft YaHei", Helvetica, sans-serif;
+		font-size: 1rem;
+	}
+
+	.carNum {
+
+	}
+</style>
+
+<body></body>
+<div class="" id="content">
+</div>
+<script type="text/javascript" src="../script/api.js"></script>
+<script type="text/javascript" src="../script/vue.min.js"></script>
+<script type="text/javascript">
+	var vm = new Vue({
+		el: "#content",
+		data: {
+			aMap: {},
+			curlon: 30.576427, //初始化地图坐标
+			curlat: 104.05754,
+			carInfoList: [], //车辆信息列表项
+			id:''//弹出气泡的id		
+		},
+		methods: {
+			init: function() {
+				vm.openMap();
+				vm.getLocation();
+				vm.getCarInfoList();
+				vm.addframe();
+			},
+			getCarInfoList: function() {
+				var mall = {
+					"func": 1002,
+					"token": $api.getStorage('token'),
+					"user_id": $api.getStorage('user_id')
+				}
+				api.ajax({
+					url: "http://47.98.166.93:8800/gps-api/api",
+					method: 'post',
+					dataType: 'json',
+					timeout: 30,
+					returnAll: false,
+					data: {
+						values: {
+							param: JSON.stringify(mall),
+							sign: "123"
+						}
+					}
+				}, function(ret, err) {
+					if (ret) {
+						// 成功返回
+						console.log('返回数据:' + JSON.stringify(ret));
+						vm.carInfoList = ret.list;
+						if (ret.list.length > 0) { //如果有返回车辆列表信息项，添加标识
+							vm.addCarIcon();
+						}
+					} else {
+
+					}
+				})
+			},
+			//添加车辆标识
+			addCarIcon: function() {
+				var carInfoList = vm.carInfoList;
+				var annotations = [];
+				carInfoList.forEach(function(item){
+					annotations.push({
+						id:item.id,
+						lon:item.lng,
+						lat:item.lat
+					});
+				});
+				vm.aMap.addAnnotations({
+					annotations: annotations,
+					icons: ['widget://image/ic_motor_bike.png'],
+					draggable: true
+				}, function(ret) {
+					if (ret.eventType == 'click') {
+						console.log(ret.id);
+						var id = ret.id;
+						api.openFrame({
+								name: 'carinfo_fra',
+								url: 'widget://html/carinfo_fra.html',
+								rect: {
+										x: 0,
+										y: 0,
+										w: 'auto',
+										h: 'auto'
+								},
+								animation: {
+		                type: "reveal", //动画类型（详见动画类型常量）
+		                subType: "from_right", //动画子类型（详见动画子类型常量）
+		                duration: 500
+		            },
+		            pageParam: {
+									carInfoList:vm.carInfoList,
+									id:id
+								},
+		            reload: false,
+								bounces: false,
+								vScrollBarEnabled: false,
+								hScrollBarEnabled: false
+						});
+					}
+				});
+			},
+
+			getLocation: function() {
+				vm.aMap.getLocation({
+					autoStop: true,
+				}, function(ret, err) {
+					api.hideProgress();
+					if (ret.status) {
+						// console.log( JSON.stringify( ret ) );
+						if ((vm.curlon != ret.lon) || (vm.curlat != ret.lat)) {
+							vm.curlon = ret.lon;
+							vm.curlat = ret.lat;
+							//设置地图中心
+							vm.aMap.setCenter({
+								coords: {
+									lon: vm.curlon,
+									lat: vm.curlat
+								},
+								animation: true
+							});
+							//显示用户位置
+							// vm.aMap.showUserLocation({
+							// 	isShow: true
+							// });
+							vm.aMap.setTrackingMode({
+								animation: true,
+								trackingMode: 'follow'
+							});
+						}
+					} else {
+						console.log(err.code);
+					}
+				});
+			},
+			openMap: function() {
+				vm.aMap.setMapAttr({
+					type: 'standard',
+					trafficOn: true,
+					building: true,
+				});
+
+				vm.aMap.open({
+					rect: {
+						x: 0,
+						y: 0,
+						w: 'auto',
+						h: api.frameHeight
+					},
+					showUserLocation: true,
+					zoomLevel: 14,
+					center: {
+						lon: vm.curlon,
+						lat: vm.curlaty
+					},
+					fixedOn: api.frameName,
+					fixed: true
+				}, function(ret, err) {
+					if (ret.status) {
+						//alert("地图已成功打开");
+					} else {
+						//	alert(JSON.stringify(err));
+					}
+				});
+
+			},
+			addframe:function(){
+				api.openFrame({
+						name: 'icon_fra',
+						url: 'widget://html/icon_fra.html',
+						rect: {
+								x: (api.winWidth - 60),
+								y: (api.winHeight * 0.7),
+								w: 50,
+								h: 50
+						},
+						bounces: false,
+						vScrollBarEnabled: false,
+						hScrollBarEnabled: false
+				});
+			}
+		}
+	})
+
+	apiready = function() {
+			//引入模块
+			vm.aMap = api.require('aMap');
+			//初始化
+			vm.init();
+
+			// api.showProgress({
+			// 	style: 'default',
+			// 	animationType: 'fade',
+			// 	title: '我在定位中...',
+			// 	text: '请稍候...',
+			// 	modal: false
+			// });
+		}
+		// setInterval("vm.getLocation()", 8000);
+</script>
+
+</html>

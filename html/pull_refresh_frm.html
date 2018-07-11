@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0" />
+	<link rel="stylesheet" type="text/css" href="../css/aui.css" />
+	<link rel="stylesheet" type="text/css" href="../css/mui.min.css" />
+</head>
+<style media="screen">
+	img {
+		min-height: 100px;
+		min-width: 100px;
+		max-width: 100px;
+		max-height: 100px;
+	}
+	.mui-table-view-cell:after {
+    left: 0;
+}
+.qianfei{
+		font: bold 55px/100% "微软雅黑", "Lucida Grande", "Lucida Sans", Helvetica, Arial, Sans;
+    width: 50%;
+    height: 70%;
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    z-index: 99;
+    color: #F43B41;
+    text-shadow: 5px 5px 0 #666, 7px 7px 0 #eee;
+    -moz-transform: rotate(-22deg);
+    -webkit-transform: rotate(-22deg);
+    -o-transform: rotate(-22deg);
+    transform: rotate(-22deg);
+			}
+</style>
+
+<body>
+	<section class="aui-refresh-content">
+		<div class="aui-content">
+			<div id="demo">
+				<!-- <div class="mui-card">
+					<ul class="mui-table-view">
+						<li class="mui-table-view-cell mui-media">
+<p class="qianfei">已欠费</p>
+							<a href="javascript:;" class="">
+								<img class="mui-media-object mui-pull-right" src="../image/10.png">
+
+								<div class="mui-media-body">
+									<p class="mui-ellipsis">车牌号:<span>成都161140</span></p>
+									<p class="mui-ellipsis">车架号:<span>1</span></p>
+									<p class="mui-ellipsis">品牌:<span>玫瑰之约</span></p>
+									<p class="mui-ellipsis">颜色:<span>白色</span></p>
+									<p class="mui-ellipsis">购买日期:<span>2018-06-04</span></p>
+									<p class="mui-ellipsis">服务开始日期:<span>2018-06-04</span></p>
+									<p class="mui-ellipsis">服务到期日期:<span>2018-06-04</span></p>
+									<p class="mui-ellipsis">归属派出所:<span>古城派出所</span></p>
+								</div>
+							</a>
+						</li>
+					</ul>
+				</div> -->
+			</div>
+		</div>
+	</section>
+</body>
+<script src="../script/api.js"></script>
+<script type="text/javascript">
+	var list;
+	var mobile = $api.getStorage('mobile'); //我的手机
+	var name = $api.getStorage('name'); //我名字
+	var sfz = $api.getStorage('sfz'); //我的身份证
+	var token = $api.getStorage('token'); //用户令牌
+	var user_id = $api.getStorage('user_id'); //用户ID
+	var mall = {
+		"func": "1002", //
+		"token": token, //用户令牌
+		"user_id": user_id //用户ID
+	}
+	apiready = function() {
+		api.parseTapmode();
+		fnLogin();
+	};
+	function sub(vlaue) {
+		var str = JSON.stringify(vlaue); //
+		var a = str.substring(0, 4);
+		var b = str.substring(4, 6);
+		var c = str.substring(6, 8);
+		return a + "年" + b + "月" + c + "日";
+	}
+	function qsub(vlaue) {
+		var str = JSON.stringify(vlaue); //
+		var a = str.substring(0, 5);
+		var b = str.substring(5, 7);
+		var c = str.substring(7, 9);
+		return a + "-" + b + "-" + c;
+	}
+	function fnLogin() {
+		api.ajax({
+				url: "http://47.98.166.93:8800/gps-api/api",
+				method: 'post',
+				timeout: 30,
+				dataType: 'json',
+				returnAll: false,
+				data: {
+					values: {
+						param: JSON.stringify(mall),
+						sign: "123"
+					}
+				}
+			}, function(ret, err) {
+				if (ret) {
+					var code = ret.code;
+					if (code == 1) {
+							var list = ret.list;
+							var wrap = document.getElementById("demo")
+							for (var i = 0; i < list.length; i++) {
+								var id = list[i].id;
+								var carno = list[i].carno; //成都161140
+								var pinpai = list[i].pinpai; //玫瑰之约
+								var cjh = list[i].cjh; //车架号
+								var color = list[i].color; //颜色
+								var lat = list[i].lat; //经纬
+								var lng = list[i].lng; //经纬
+								var status = list[i].status; //地位
+								var online = list[i].online; //
+								var speed = list[i].speed;
+								var fx = list[i].fx;
+								var st = parseInt(list[i].stime)
+								var et = parseInt(list[i].etime)
+								var stime = sub(st); //服务开始时间
+								var etime = sub(et); //服务截止时间
+								var buy_ = parseInt(list[i].buy_date);
+								var buy_date = sub(buy_); //购买日期
+								var group_id = list[i].group_id;
+								var group_name = list[i].group_name; //古城派出所
+								var base64 = list[i].base64;
+								var nowdate = new Date();
+								var year = nowdate.getFullYear();
+								var month = nowdate.getMonth() + 1 < 10 ? "0" + (nowdate.getMonth() + 1) :
+									nowdate.getMonth() + 1;
+								var day = nowdate.getDate() < 10 ? "0" + nowdate.getDate() : nowdate
+									.getDate();
+								var dateStr = year + "-" + month + "-" + day;
+								var b = new Date(dateStr)
+								var qsu = qsub(list[i].etime);
+								var a = new Date(qsu)
+								console.log(a)
+								console.log(b)
+								if (b<a) {
+									var p = '<p class="" style="display:none"></p>';
+								} else {
+									var p = '<p class="qianfei">已欠费</p>';
+								}
+								var conten =
+									'<div class="mui-card"><ul class="mui-table-view"><li class=mui-table-view-cell mui-media mui-card>' + p + '<a href="javascript:;"><div class="mui-media-body">' +
+									'<img class="mui-media-object mui-pull-right" src="data:image/jpeg;base64,' + base64 + '">' +
+									'<p class="mui-ellipsis">车牌号:<span>' + carno + '</span></p>' +
+									'<p class="mui-ellipsis">车架号:<span>' + cjh + '</span></p>' +
+									'<p class="mui-ellipsis">品牌:<span>' + pinpai + '</span></p>' +
+									'<p class="mui-ellipsis">颜色:<span>' + color + '</span></p>' +
+									'<p class="mui-ellipsis">购买日期:<span>' + buy_date + '</span></p>' +
+									'<p class="mui-ellipsis">服务开始日期:<span>' + stime + '</span></p>' +
+									'<p class="mui-ellipsis">服务到期日期:<span>' + etime + '</span></p>' +
+									'<p class="mui-ellipsis">归属派出所:<span>' + group_name + '</span></p>' +
+									'</div></a></li></ul></div>';
+								wrap.insertAdjacentHTML('afterbegin', conten);
+							}
+					}
+				}
+		})
+}
+
+</script>
+
+</html>
